@@ -646,6 +646,10 @@ class Image_moo
 			$sy = ($this->height - $calc_height) / 2;
 			$sy2 = $calc_height;
 		}
+		
+		//image transparency preserved
+		imagealphablending( $this->temp_image, false );
+		imagesavealpha( $this->temp_image, true );
 
 		// copy section
 		imagecopyresampled($this->temp_image, $this->main_image, 0, 0, $sx, $sy, $mw, $mh, $sx2, $sy2);

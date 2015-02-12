@@ -1007,7 +1007,7 @@ class Image_moo
 					break;
 				default:
 					$dest_x = $offset;
-					$this->set_error("Watermark position $position not in vlaid range 7,8,9 - 4,5,6 - 1,2,3");
+					$this->set_error("Watermark position $position not in valid range 7,8,9 - 4,5,6 - 1,2,3");
 			}
 			// do y position
 			switch ($position)
@@ -1032,7 +1032,7 @@ class Image_moo
 					break;
 				default:
 					$dest_y = $offset;
-					$this->set_error("Watermark position $position not in vlaid range 7,8,9 - 4,5,6 - 1,2,3");
+					$this->set_error("Watermark position $position not in valid range 7,8,9 - 4,5,6 - 1,2,3");
 			}
 
 		}
@@ -1221,7 +1221,7 @@ class Image_moo
 			default:
 				$sh_x = $size;
 				$pic_x = 0;
-				$this->set_error("Shadow position $position not in vlaid range 7,8,9 - 4,5,6 - 1,2,3");
+				$this->set_error("Shadow position $position not in valid range 7,8,9 - 4,5,6 - 1,2,3");
 		}
 		// do y position
 		switch ($direction)
@@ -1250,7 +1250,7 @@ class Image_moo
 			default:
 				$sh_y = $size;
 				$pic_y = 0;
-				$this->set_error("Shadow position $position not in vlaid range 7,8,9 - 4,5,6 - 1,2,3");
+				$this->set_error("Shadow position $position not in valid range 7,8,9 - 4,5,6 - 1,2,3");
 		}
 
 		// create the shadow

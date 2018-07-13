@@ -610,8 +610,11 @@ class Image_moo
 		// clear temp image
 		$this->clear_temp();
 
-		// create a temp based on new dimensions
-		$this->temp_image = imagecreatetruecolor($mw, $mh);
+		if( $this->width > $mw || $this->height > $mh || $this->can_stretch)
+			// create a temp based on new dimensions
+			$this->temp_image = imagecreatetruecolor($mw, $mh);
+		else
+			return $this;
 
 		// check it
 		if(!is_resource($this->temp_image))

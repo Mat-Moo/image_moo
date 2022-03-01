@@ -1,4 +1,4 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 /*
  * Image_Moo library
  *
@@ -201,13 +201,22 @@ class Image_moo
 		}
 	}
 
+	//----------------------------------------------------------------------------------------------------------
+	// checks that we have an GD image loaded
+	//---
+
+	private function is_gd_image( $image ) {
+
+		return ( (is_resource($image) && get_resource_type( $image ) === 'gd') || (is_object( $image ) && $image instanceof GdImage) );
+	}
+
 	private function _check_image()
 	//----------------------------------------------------------------------------------------------------------
 	// checks that we have an image loaded
 	//----------------------------------------------------------------------------------------------------------
 	{
 		// generic check
-		if (!is_resource($this->main_image))
+		if (!$this->is_gd_image($this->main_image))
 		{
 			$this->set_error("No main image loaded!");
 			return FALSE;
@@ -421,7 +430,7 @@ class Image_moo
 		// validate we loaded a main image
 		if (!$this->_check_image()) return $this;
 
-		if (!is_resource($this->temp_image))
+		if (!$this->is_gd_image($this->temp_image))
 		{
 			$this->set_error("No temp image created!");
 			return FALSE;
@@ -478,10 +487,10 @@ class Image_moo
 	// Load an image, public function
 	//----------------------------------------------------------------------------------------------------------
 	{
-		if(is_resource($this->watermark_image)) imagedestroy($this->watermark_image);
+		if($this->is_gd_image($this->watermark_image)) imagedestroy($this->watermark_image);
 		$this->watermark_image = $this->_load_image($filename);
 
-		if(is_resource($this->watermark_image))
+		if($this->is_gd_image($this->watermark_image))
 		{
 			$this->watermark_method = 1;
 			if(($transparent_x <> NULL) AND ($transparent_y <> NULL))
@@ -561,13 +570,13 @@ class Image_moo
 	// If temp image is empty, e.g. not resized or done anything then just copy main image
 	//----------------------------------------------------------------------------------------------------------
 	{
-		if (!is_resource($this->temp_image))
+		if (!$this->is_gd_image($this->temp_image))
 		{
 			// create a temp based on new dimensions
 			$this->temp_image = imagecreatetruecolor($this->width, $this->height);
 
 			// check it
-			if(!is_resource($this->temp_image))
+			if(!$this->is_gd_image($this->temp_image))
 			{
 				$this->set_error('Unable to create temp image sized '.$this->width.' x '.$this->height);
 				return FALSE;
@@ -584,9 +593,9 @@ class Image_moo
 	// clear everything!
 	//----------------------------------------------------------------------------------------------------------
 	{
-		if(is_resource($this->main_image)) imagedestroy($this->main_image);
-		if(is_resource($this->watermark_image)) imagedestroy($this->watermark_image);
-		if(is_resource($this->temp_image)) imagedestroy($this->temp_image);
+		if($this->is_gd_image($this->main_image)) imagedestroy($this->main_image);
+		if($this->is_gd_image($this->watermark_image)) imagedestroy($this->watermark_image);
+		if($this->is_gd_image($this->temp_image)) imagedestroy($this->temp_image);
 		return $this;
 	}
 
@@ -595,7 +604,7 @@ class Image_moo
 	// you may want to revert back to teh original image to work on, e.g. watermark, this clears temp
 	//----------------------------------------------------------------------------------------------------------
 	{
-		if(is_resource($this->temp_image)) imagedestroy($this->temp_image);
+		if($this->is_gd_image($this->temp_image)) imagedestroy($this->temp_image);
 		return $this;
 	}
 
@@ -617,7 +626,7 @@ class Image_moo
 			return $this;
 
 		// check it
-		if(!is_resource($this->temp_image))
+		if(!$this->is_gd_image($this->temp_image))
 		{
 			$this->set_error('Unable to create temp image sized '.$mw.' x '.$mh);
 			return $this;
@@ -714,7 +723,7 @@ class Image_moo
 		$this->temp_image = imagecreatetruecolor($tx,$ty);
 
 		// check it
-		if(!is_resource($this->temp_image))
+		if(!$this->is_gd_image($this->temp_image))
 		{
 			$this->set_error('Unable to create temp image sized '.$tx.' x '.$ty);
 			return $this;
@@ -771,7 +780,7 @@ class Image_moo
 		$this->temp_image = imagecreatetruecolor($mw, $mh);
 
 		// check it
-		if(!is_resource($this->temp_image))
+		if(!$this->is_gd_image($this->temp_image))
 		{
 			$this->set_error('Unable to create temp image sized '.$mh.' x '.$mw);
 			return $this;
@@ -808,7 +817,7 @@ class Image_moo
 		$this->temp_image = imagecreatetruecolor($x2-$x1, $y2-$y1);
 
 		// check it
-		if(!is_resource($this->temp_image))
+		if(!$this->is_gd_image($this->temp_image))
 		{
 			$this->set_error('Unable to create temp image sized '.($x2-$x1).' x '.($y2-$y1));
 			return $this;
@@ -918,7 +927,7 @@ class Image_moo
 		$bl = $bbox[1];
 
 		// use this to create watermark image
-		if(is_resource($this->watermark_image)) imagedestroy($this->watermark_image);
+		if($this->is_gd_image($this->watermark_image)) imagedestroy($this->watermark_image);
 		$this->watermark_image = imagecreatetruecolor($bw, $bh);
 
 		// set colours
@@ -955,7 +964,7 @@ class Image_moo
 		if (!$this->_check_image()) return $this;
 
 		// validate we have a watermark
-		if(!is_resource($this->watermark_image))
+		if(!$this->is_gd_image($this->watermark_image))
 		{
 			$this->set_error("Can't watermark image, no watermark loaded/created");
 			return $this;
@@ -1179,7 +1188,7 @@ class Image_moo
 		$bu_image = imagecreatetruecolor($sx, $sy);
 
 		// check it
-		if(!is_resource($bu_image))
+		if(!$this->is_gd_image($bu_image))
 		{
 			$this->set_error('Unable to create shadow temp image sized '.$this->width.' x '.$this->height);
 			return FALSE;
@@ -1377,7 +1386,7 @@ class Image_moo
 		}
 
 		// is there a temp image?
-		if ( ! is_resource($this->temp_image))
+		if ( ! $this->is_gd_image($this->temp_image))
 		{
 			$this->new_height = $this->height;
 			$this->new_width = $this->width;

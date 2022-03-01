@@ -216,7 +216,7 @@ class Image_moo
 	//----------------------------------------------------------------------------------------------------------
 	{
 		// generic check
-		if (!$this->($this->main_image))
+		if (!$this->is_gd_image($this->main_image))
 		{
 			$this->set_error("No main image loaded!");
 			return FALSE;

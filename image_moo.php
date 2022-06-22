@@ -11,12 +11,12 @@
  * @email		matthew@dps.uk.com
  *
  * @file		image_moo.php
- * @version		1.1.6
- * @date		2014 Feb 5
+ * @version		1.1.7
+ * @date		2022 Jun 21
  *
  * Copyright (c) 2011-2014 Matthew (Mat-Moo.com) Augier
- *
- * Requires PHP 5 and GD2!
+ * 
+ * Requires PHP 5+ and GD2!
  *
  * Example usage
  *    $this->image_moo->load("file")->resize(64,40)->save("thumb")->resize(640,480)->save("medium");
@@ -27,14 +27,14 @@
  *
  * image manipulation functions
  * -----------------------------------------------------------------------------
- * load($x) - Loads an image file specified by $x - JPG, PNG, GIF supported
+ * load($x) - Loads an image file specified by $x - JPG, PNG, GIF, WEBP supported
  * load_temp() - Takes a cropped/altered image and makes it the main image to work with.
- * save($x) - Saved the manipulated image (if applicable) to file $x - JPG, PNG, GIF supported
+ * save($x) - Saved the manipulated image (if applicable) to file $x - JPG, PNG, GIF, WEBP supported
  * get_data_stream($filename="") - Return the image as a stream so that it can be sent as source data to the output
  * save_pa($prepend="", $append="", $overwrite=FALSE) - Saves using the original image name but with prepend and append text, e.g. load('moo.jpg')->save_pa('pre_','_app') would save as filename pre_moo_app.jpg
- * save_dynamic($filename="") - Saves as a stream output, use filename to return png/jpg/gif etc., default is jpeg
- * resize($x,$y=FALSE,$pad=FALSE) - Proportioanlly resize original image using the bounds $x and $y (if y is false x size is used), if padding is set return image is as defined centralised using BG colour
- * resize_crop($x,$y) - Proportioanlly resize original image using the bounds $x and $y but cropped to fill dimensions
+ * save_dynamic($filename="") - Saves as a stream output, use filename to return png/jpg/gif/webp etc., default is jpeg
+ * resize($x,$y=FALSE,$pad=FALSE) - Proportionally resize original image using the bounds $x and $y (if y is false x size is used), if padding is set return image is as defined centralised using BG colour
+ * resize_crop($x,$y) - Proportionally resize original image using the bounds $x and $y but cropped to fill dimensions
  * stretch($x,$y) - Take the original image and stretch it to fill new dimensions $x $y
  * crop($x1,$y1,$x2,$y2) - Crop the original image using Top left, $x1,$y1 to bottom right $x2,y2. New image size =$x2-x1 x $y2-y1
  * rotate($angle) - Rotates the work image by X degrees, normally 90,180,270 can be any angle.Excess filled with background colour
@@ -52,7 +52,7 @@
  * allow_scale_up($onoff = FALSE) - When using resize, setting this to tru will allow small images to increase in size, otherwise they do not get resized
  * real_filesize() - returns the filesize of the image in bytes etc.
  * display_errors($open = '<p>', $close = '</p>') - Display errors as Ci standard style
- * set_jpeg_quality($x) - quality to wrte jpeg files in for save, default 75 (1-100)
+ * set_jpeg_quality($x) - quality to write jpeg/webp files in for save, default 75 (1-100)
  * set_watermark_transparency($x) - the opacity of the watermark 1-100, 1-just about see, 100=solid
  * check_gd() - Run to see if you server can use this library
  * clear_temp() - Call to clear the temp changes using the master image again
@@ -70,6 +70,7 @@
  * Cole spotting the resize flaw and providing a fix
  * Nuno Mira for suggesting the new width/new size on teh ci forums
  * HugoSolar for transparent rotate
+ * EbbenF/Locally.com for webp support
  *
  */
 
@@ -106,7 +107,7 @@ class Image_moo
 	// create stuff here as needed
 	//----------------------------------------------------------------------------------------------------------
 	{
-		log_message('debug', "Image Moo Class Initialized");
+		// log_message('debug', "Image Moo Class Initialized");
 		if ($this->jpeg_ignore_warnings) $this->ignore_jpeg_warnings();
 		if ($this->can_stretch) $this->can_stretch(TRUE);
 	}
@@ -259,6 +260,9 @@ class Image_moo
 			case "PNG" :
 				imagepng($this->temp_image);
 				break;
+			case "WEBP":
+				imagewebp($this->temp_image);
+				break;
 			default:
 				$this->set_error('Extension not recognised! Must be jpg/png/gif');
 				return FALSE;
@@ -309,6 +313,11 @@ class Image_moo
 			case "PNG" :
 				header("Content-type: image/png");
 				imagepng($this->temp_image);
+				return $this;
+				break;
+			case "WEBP":
+				header("Content-type: image/webp");
+				imagewebp($this->temp_image, NULL, $this->jpeg_quality);
 				return $this;
 				break;
 		}
@@ -374,6 +383,10 @@ class Image_moo
 				imagepng($this->temp_image, $filename);
 				return $this;
 				break;
+			case "WEBP" :
+				imagewebp($this->temp_image, $filename, $this->jpeg_quality);
+				return $this;
+				break;
 		}
 
 		// invalid filetype?!
@@ -409,6 +422,9 @@ class Image_moo
 					break;
 				case "image/png" :
 	 		        return @imagecreatefrompng($filename);
+					break;
+				case "image/webp" :
+					return @imagecreatefromwebp($filename);
 					break;
 			}
 		}
